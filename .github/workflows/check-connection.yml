@@ -1,19 +1,23 @@
-name: Check SSH connection
+name: Find SSH port
 
 on:
   workflow_dispatch:
 
 jobs:
-  check:
+  find-port:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        port: [22, 1022, 2222, 222, 10022]
     steps:
-      - name: Check SSH connection
+      - name: Try port ${{ matrix.port }}
+        continue-on-error: true
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 1022
+          port: ${{ matrix.port }}
           script: |
+            echo "✅ Порт ${{ matrix.port }} работает!"
             pwd
-            ls -la
